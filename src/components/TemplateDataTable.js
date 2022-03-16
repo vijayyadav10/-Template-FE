@@ -36,7 +36,7 @@ export default class TemplateDataTable extends Component {
                         <thead>
                             <tr>
                                 <th>Code</th>
-                                <th>Content Type</th>
+                                <th>Collection Type</th>
                                 <th>Content Template Name</th>
                                 <th>Action</th>
                             </tr>

@@ -115,7 +115,7 @@ class AddTemplate extends Component {
                             <div className="col-lg-2" style={{ textAlign: "end" }}>
                                 <label htmlFor="id" className="control-label">
                                     <span className="FormLabel">
-                                        <span>Content Type</span>
+                                        <span>Collection Type</span>
                                         <sup>
                                             <i className="fa fa-asterisk required-icon FormLabel__required-icon"></i>
                                         </sup>
