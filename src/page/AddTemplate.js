@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 import { Typeahead } from 'react-bootstrap-typeahead'
 import { Link } from 'react-router-dom'
 import AceEditor from 'react-ace';
-import 'brace/mode/java';
-import 'brace/theme/github';
-import "brace/theme/monokai"; //
+import 'brace/mode/html';
+import 'brace/theme/tomorrow';
+import 'brace/snippets/html';
+import 'brace/ext/language_tools';
 import { postTemplate } from '../api/Api';
 import { withRouter } from "react-router-dom";
 import ModalUI from '../components/ModalUI';
@@ -168,13 +169,34 @@ class AddTemplate extends Component {
                             <div className="col-lg-2" style={{ textAlign: "end" }}>
                             </div>
                             <div className="col-lg-10">
-                                <AceEditor
-                                    mode="javascript"
+                                {/* <AceEditor
+                                    mode="html"
                                     theme="monokai"
                                     onChange={this.handleContentTypeProgram}
                                     name="UNIQUE_ID_OF_DIV"
+                                    width='100%'
                                     value={this.state.contentTypeProgram}
                                     editorProps={{ $blockScrolling: true }}
+                                /> */}
+                                <AceEditor
+                                    mode="html"
+                                    theme="tomorrow"
+                                    width="100%"
+                                    showPrintMargin={false}
+                                    editorProps={{
+                                        $blockScrolling: Infinity,
+                                    }}
+                                    setOptions={{
+                                        useWorker: false,
+                                    }}
+                                    style={{ border: '1px solid #ddd' }}
+                                    enableBasicAutocompletion
+                                    enableLiveAutocompletion
+                                    enableSnippets
+                                    name='UNIQUE_ID_OF_DIV'
+                                    onChange={this.handleContentTypeProgram}
+                                    onLoad={this.onEditorLoaded}
+                                    value={this.state.contentTypeProgram}
                                 />
                             </div>
                         </div>
