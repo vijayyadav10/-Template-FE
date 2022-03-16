@@ -1,0 +1,30 @@
+/* html, body {
+  background-color: #aaa;
+}
+
+h1, p {
+  font-family: Lato;
+}
+
+button {
+  margin-right: 15px;
+}
+
+.app-container {
+  margin-top: 15px;
+}
+
+.counter-box {
+  margin-bottom: 15px;
+} */
+
+/* .modal-dialog {
+  min-width: 75vw;
+} */
+
+.modal-body {
+  background-color: #f0f0f0;
+  margin: 1rem;
+  border: 1px solid lightgray;
+  height: 30rem;
+}
