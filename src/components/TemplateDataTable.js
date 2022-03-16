@@ -1,7 +1,7 @@
 import Paginator from 'patternfly-react/dist/js/components/Pagination/Paginator'
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { getTemplate } from '../api/Api'
+import { deleteTemplate, getTemplate } from '../api/Api'
 import { DropdownKebab, MenuItem } from 'patternfly-react';
 import ModalUI from './ModalUI';
 
@@ -9,16 +9,23 @@ export default class TemplateDataTable extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { templateData: [], modalShow: false };
+        this.state = { templateData: [], modalShow: false, selectedTempate: null };
     }
 
     componentDidMount = async () => {
-        const { data: { data } } = await getTemplate();
+        const { data } = await getTemplate();
         this.setState({ templateData: data })
     }
 
     modalHide = () => {
         this.setState({ modalShow: false });
+    }
+
+    handleDelete = async () => {
+        await deleteTemplate(this.state.selectedTempate.code).then((res) => {
+            this.componentDidMount();
+            this.modalHide();
+        });
     }
 
     render() {
@@ -36,11 +43,14 @@ export default class TemplateDataTable extends Component {
                         </thead>
                         <tbody>
                             {this.state.templateData && this.state.templateData.map((el, idx) => {
+                                console.log(
+                                    'el', el
+                                );
                                 return (
                                     <tr key={idx}>
-                                        <td>{el.attributes.code}</td>
-                                        <td>{el.attributes.collectionType}</td>
-                                        <td>{el.attributes.description}</td>
+                                        <td>{el.code || el.attributes.code}</td>
+                                        <td>{el.collectiontype || el.attributes.collectionType}</td>
+                                        <td>{el.description || el.attributes.description}</td>
                                         <td>
                                             <DropdownKebab
                                                 className=""
@@ -56,7 +66,7 @@ export default class TemplateDataTable extends Component {
                                                     divider={false}
                                                     header={false}
                                                 >
-                                                    <span onClick={() => this.setState({ modalShow: true })}>
+                                                    <span onClick={() => this.setState({ modalShow: true, selectedTempate: el})}>
                                                         Delete
                                                     </span>
                                                 </MenuItem>
@@ -66,7 +76,7 @@ export default class TemplateDataTable extends Component {
                                                     divider={false}
                                                     header={false}
                                                 >
-                                                    <Link to={`/edit-template/${el.attributes.code}`}>
+                                                    <Link to={`/edit-template/${el.code || el.attributes.code}`}>
                                                         Edit
                                                     </Link>
                                                 </MenuItem>
@@ -115,7 +125,7 @@ export default class TemplateDataTable extends Component {
                         </button>
                     </Link>
                 </div>
-                <ModalUI modalShow={this.state.modalShow} modalHide={this.modalHide} />
+                <ModalUI modalShow={this.state.modalShow} modalHide={this.modalHide} handleDelete={this.handleDelete} selectedTemp={this.state.selectedTempate}/>
             </div>
         )
     }

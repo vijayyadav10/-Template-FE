@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const apiEndpoint = 'http://localhost:1337/api/templates';
+// const apiEndpoint = 'http://localhost:1337/api/templates';
+const apiEndpoint = 'http://localhost:8082/api/templates';
 
 export const getTemplate = async () => {
     let url = `${apiEndpoint}`;
@@ -14,9 +15,8 @@ export const postTemplate = async (data) => {
 }
 
 export const deleteTemplate = async (codeId) => {
-    const { data: { data } } = await getTemplateByCodeId(codeId);
-    const tempId = data[0].id;
-    return await axios.delete(`${apiEndpoint}/${tempId}`)
+    console.log('selectedCode to be deleted', codeId);
+    return await axios.delete(`${apiEndpoint}/${codeId}`)
 }
 
 export const editTemplate = async (codeId, dataToUpdate) => {

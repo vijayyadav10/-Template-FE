@@ -46,19 +46,16 @@ class AddTemplate extends Component {
         // console.table(this.state);
         event.preventDefault();
         // // API Call
-
-        await postTemplate({
-            data: {
-                code: this.state.code,
-                description: this.state.name,
-                collectionType: this.state.contentType[0],
-                contentShape: this.state.contentTypeProgram,
-            }
-        }).then((res) => {
+        const data = {
+            code: this.state.code,
+            description: this.state.name,
+            collectionType: this.state.contentType[0],
+            contentShape: this.state.contentTypeProgram,
+        }
+        console.log('payload', data);
+        await postTemplate(data).then((res) => {
             this.props.history.push('/')
         });
-
-        
     }
 
     render() {

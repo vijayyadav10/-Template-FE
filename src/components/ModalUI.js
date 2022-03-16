@@ -19,8 +19,12 @@ export default class ModalUI extends Component {
                     <Modal.Title>Delete</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Delete News - Detail
-                    Do you really want to delete?
+                    <h2 className='text-center'>
+                        <strong>
+                            Do you really want to delete this template
+                        </strong>
+                    </h2>
+                    {/* {JSON.stringify(this.props.selectedTemp)} ? */}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
@@ -32,10 +36,10 @@ export default class ModalUI extends Component {
                     </Button>
                     <Button
                         bsStyle="danger"
-                        className="btn-cancel"
-                        onClick={()=>{}}
+                        className="btn-delete"
+                        onClick={this.props.handleDelete}
                     >
-                        Close
+                        delete
                     </Button>
                 </Modal.Footer>
             </Modal>
