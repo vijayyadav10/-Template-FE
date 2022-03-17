@@ -19,10 +19,8 @@ export const deleteTemplate = async (codeId) => {
     return await axios.delete(`${apiEndpoint}/${codeId}`)
 }
 
-export const editTemplate = async (codeId, dataToUpdate) => {
-    const { data: { data } } = await getTemplateByCodeId(codeId);
-    const tempId = data[0].id;
-    return await axios.put(`${apiEndpoint}/${tempId}`, data)
+export const editTemplate = async (codeId, data) => {
+    return await axios.put(`${apiEndpoint}/${codeId}`, data)
 }
 
 export const getTemplateByCodeId = async (codeId) => {

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import AceEditor from 'react-ace';
 import 'brace/mode/java';
 import 'brace/theme/github';
-import { getTemplateByCodeId } from '../api/Api';
+import { editTemplate, getTemplateByCodeId } from '../api/Api';
 // import { Row, Col, Grid, Breadcrumb } from 'patternfly-react';
 import { withRouter } from "react-router-dom";
 
@@ -13,13 +13,10 @@ class EditTemplate extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            id: '',
-            attributes: {
-                code: '',
-                name: '',
-                contentType: [],
-                contentTypeProgram: '',
-            }
+            code: '',
+            name: '',
+            contentType: [],
+            contentTypeProgram: '',
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCodeChange = this.handleCodeChange.bind(this);
@@ -28,7 +25,7 @@ class EditTemplate extends Component {
     }
 
     updateState = (propName, value) => {
-        let cloneObj = this.state.attributes;
+        let cloneObj = this.state;
         if (propName === 'contentType') {
             cloneObj[propName] = value;
             return cloneObj;
@@ -60,36 +57,38 @@ class EditTemplate extends Component {
         event.preventDefault();
         // // API Call
 
-        // await postTemplate({
-        //     data: {
-        //         code: this.state.code,
-        //         description: this.state.name,
-        //         collectionType: this.state.contentType[0],
-        //         contentShape: this.state.contentTypeProgram,
-        //     }
-        // }).then((res) => {
-        //     this.props.history.push('/')
-        // });
+        await editTemplate(this.state.code, {
+            description: this.state.name,
+            collectionType: this.state.contentType[0],
+            contentShape: this.state.contentTypeProgram,
+        }).
+        then(res=>this.props.history.push('/'), err => console.error('error in EditTemplate.js handleSubmit method'))
     }
 
     componentDidMount = async () => {
-        const { data: { data } } = await getTemplateByCodeId(this.props.match.params.templateId);
-        const getData = {
-            code: data[0].attributes.code,
-            contentType: [data[0].attributes.collectionType],
-            name: data[0].attributes.description,
-            contentTypeProgram: data[0].attributes.contentShape,
-        }
-        this.setState({ id: data[0].id, attributes: getData })
+        const { data } = await getTemplateByCodeId(this.props.match.params.templateId);
+        console.log("DATA",data)
+        // const getData = {
+        //     code: data[0].code,
+        //     contentType: [data[0].collectionType],
+        //     name: data[0].description,
+        //     contentTypeProgram: data[0].contentShape,
+        // }
+        this.setState({
+             code: data[0].code,
+            contentType: [data[0].collectiontype],
+            name: data[0].description,
+            contentTypeProgram: data[0].contentshape
+        })
     }
 
     render() {
-        console.log("RENDER",this.state.attributes.contentType)
+        console.log("RENDER",this.state.contentType)
         return (
             <div style={{ margin: "1rem 1rem" }}>
                 <h1 style={{ fontWeight: "600" }}>Edit content template</h1>
                 <hr />
-                {this.state.id &&
+                {this.state.code &&
                     <div className="formContainer show-grid">
                         <form onSubmit={this.handleSubmit}>
                             <div className="formContainer col-xs-12">
@@ -112,7 +111,7 @@ class EditTemplate extends Component {
                                         id="id"
                                         placeholder=""
                                         className="form-control RenderTextInput"
-                                        value={this.state.attributes.code}
+                                        value={this.state.code}
                                         onChange={this.handleCodeChange}
                                     />
                                 </div>
@@ -137,7 +136,7 @@ class EditTemplate extends Component {
                                         id="id"
                                         placeholder=""
                                         className="form-control RenderTextInput"
-                                        value={this.state.attributes.name}
+                                        value={this.state.name}
                                         onChange={this.handleNameChange} />
                                 </div>
                             </div>
@@ -160,7 +159,7 @@ class EditTemplate extends Component {
                                         onChange={this.handleTypeaheadChangeContentType}
                                         options={['Banner', 'News', '2 columns']}
                                         placeholder="Choose..."
-                                        selected={this.state.attributes.contentType}
+                                        selected={this.state.contentType}
                                     />
                                 </div>
                             </div>
@@ -204,7 +203,7 @@ class EditTemplate extends Component {
                                         onChange={this.handleContentTypeProgram}
                                         name="UNIQUE_ID_OF_DIV"
                                         editorProps={{ $blockScrolling: true }}
-                                        value={this.state.attributes.contentTypeProgram}
+                                        value={this.state.contentTypeProgram}
                                     />
                                 </div>
                             </div>
