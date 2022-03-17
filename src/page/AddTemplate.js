@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Typeahead } from 'react-bootstrap-typeahead'
 import { Link } from 'react-router-dom'
 import AceEditor from 'react-ace';
+import ace from 'brace';
 import 'brace/mode/html';
 import 'brace/theme/tomorrow';
 import 'brace/snippets/html';
@@ -11,6 +12,13 @@ import { withRouter } from "react-router-dom";
 import ModalUI from '../components/ModalUI';
 // import { Row, Col, Grid, Breadcrumb } from 'patternfly-react';
 
+//sachin start
+const langTools = ace.acequire('ace/ext/language_tools');
+const tokenUtils = ace.acequire('ace/autocomplete/util');
+const { textCompleter, keyWordCompleter, snippetCompleter } = langTools;
+const defaultCompleters = [textCompleter, keyWordCompleter, snippetCompleter];
+//sachin end
+
 class AddTemplate extends Component {
     constructor(props) {
         super(props)
@@ -19,8 +27,17 @@ class AddTemplate extends Component {
             name: '',
             contentType: [],
             contentTypeProgram: '',
-            collectionTypes: []
+            collectionTypes: [],
+            ///////////////////////sachin start
+            editor: null,
+            dictionaryLoaded: false,
+            dictionary: [],
+            dictList: [],
+            dictMapped: {},
+            contentTemplateCompleter: null,
         };
+        this.onEditorLoaded = this.onEditorLoaded.bind(this);
+        ///////////////////////sachin end
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCodeChange = this.handleCodeChange.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
@@ -58,6 +75,149 @@ class AddTemplate extends Component {
             this.props.history.push('/')
         });
     }
+    /////////////////////////sachin
+    onEditorLoaded(editor) {
+        this.setState({ editor });
+
+        this.initCompleter();
+
+        editor.commands.addCommand({
+            name: 'dotCommandSubMethods',
+            bindKey: { win: '.', mac: '.' },
+            exec: () => {
+                editor.insert('.');
+                const { selection } = editor;
+                const cursor = selection.getCursor();
+                const extracted = this.extractCodeFromCursor(cursor);
+                const { namespace } = extracted;
+                if (!namespace) {
+                    this.enableRootSuggestions();
+                    return;
+                }
+
+                const [rootSpace, ...subSpace] = namespace.split('.');
+
+                if (subSpace.length > 1) {
+                    this.enableRootSuggestions();
+                    return;
+                }
+
+                const verified = subSpace.length
+                    ? this.findTokenInDictMap(subSpace[0], rootSpace)
+                    : this.findTokenInDictMap(rootSpace);
+                if (verified) {
+                    this.disableRootSuggestions();
+                } else {
+                    this.enableRootSuggestions();
+                }
+                editor.execCommand('startAutocomplete');
+            },
+        });
+    }
+
+    disableRootSuggestions() {
+        const { contentTemplateCompleter } = this.state;
+        langTools.setCompleters([contentTemplateCompleter]);
+    }
+
+    enableRootSuggestions() {
+        const { dictionary, contentTemplateCompleter } = this.state;
+        langTools.setCompleters([...defaultCompleters, contentTemplateCompleter]);
+        this.setState({
+            dictList: [...dictionary],
+        });
+    }
+
+    initCompleter() {
+        const contentTemplateCompleter = {
+            getCompletions: (
+                _editor,
+                session,
+                cursor,
+                prefix,
+                callback,
+            ) => {
+                const extracted = this.extractCodeFromCursor(cursor, prefix);
+                const { namespace } = extracted;
+                if (!namespace) {
+                    this.enableRootSuggestions();
+                } else {
+                    const [rootSpace, ...subSpace] = namespace.split('.');
+
+                    const verified = subSpace.length
+                        ? this.findTokenInDictMap(subSpace[0], rootSpace)
+                        : this.findTokenInDictMap(rootSpace);
+                    if (verified) {
+                        this.disableRootSuggestions();
+                        const { dictMapped } = this.state;
+                        if (verified.namespace) {
+                            const mappedToken = dictMapped[verified.namespace];
+                            const dictList = mappedToken[verified.term]
+                                .map(entry => createSuggestionItem(entry, verified.namespace, 2));
+                            this.setState({ dictList });
+                        } else {
+                            const mappedToken = dictMapped[verified.term];
+                            const dictList = Object.entries(mappedToken)
+                                .map(([entry]) => createSuggestionItem(entry, verified.term, 1));
+                            this.setState({ dictList });
+                        }
+                    } else {
+                        this.disableRootSuggestions();
+                    }
+                }
+                let wordList = [{
+                    "word": "flow",
+                    "freq": 24,
+                    "score": 300,
+                    "flags": "bc",
+                    "syllables": "1"
+                  },
+                  {
+                    "word": "Noflow",
+                    "freq": 4,
+                    "score": 300,
+                    "flags": "bc",
+                    "syllables": "1"
+                  }
+                  ];
+                const { dictList } = this.state;
+                console.log('dictList === ', dictList);
+
+                // callback(null, wordList);
+                
+                console.log('wordList === ', wordList);
+                callback(null, wordList.map(function(ea) {
+                    return {
+                      name: ea.word,
+                      value: ea.word,
+                      score: ea.score,
+                      meta: "rhyme"
+                    };
+                  }))
+            },
+        };
+
+        langTools.setCompleters([...defaultCompleters, contentTemplateCompleter]);
+        this.setState({ contentTemplateCompleter });
+    }
+
+
+    extractCodeFromCursor({ row, column }, prefixToken) {
+        const { editor: { session } } = this.state;
+        const codeline = (session.getDocument().getLine(row)).trim();
+        const token = prefixToken || tokenUtils.retrievePrecedingIdentifier(codeline, column);
+        const wholeToken = tokenUtils.retrievePrecedingIdentifier(
+            codeline,
+            column,
+            /[.a-zA-Z_0-9$\-\u00A2-\uFFFF]/,
+        );
+        if (token === wholeToken) {
+            return { token, namespace: '' };
+        }
+        const namespace = wholeToken.replace(/\.$/g, '');
+        return { token, namespace };
+    }
+    ///////////////////////// sachin end
 
     componentDidMount = async () => {
         let contentTypes = await getCollectionTypes();
