@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom'
 import { deleteTemplate, getTemplate } from '../api/Api'
 import { DropdownKebab, MenuItem } from 'patternfly-react';
 import ModalUI from './ModalUI';
+import { withRouter } from "react-router-dom";
 
-export default class TemplateDataTable extends Component {
+class TemplateDataTable extends Component {
 
     constructor(props) {
         super(props);
@@ -75,10 +76,11 @@ export default class TemplateDataTable extends Component {
                                                     disabled={false}
                                                     divider={false}
                                                     header={false}
+                                                    onClick={()=>this.props.history.push(`/edit-template/${el.code || el.attributes.code}`)}
                                                 >
-                                                    <Link to={`/edit-template/${el.code || el.attributes.code}`}>
+                                                    {/* <Link to={`/edit-template/${el.code || el.attributes.code}`}> */}
                                                         Edit
-                                                    </Link>
+                                                    {/* </Link> */}
                                                 </MenuItem>
 
                                             </DropdownKebab>
@@ -132,3 +134,5 @@ export default class TemplateDataTable extends Component {
 }
 
 {/* <ModalUI /> */ }
+
+export default withRouter(TemplateDataTable);

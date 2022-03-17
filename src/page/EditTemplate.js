@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import AceEditor from 'react-ace';
 import 'brace/mode/java';
 import 'brace/theme/github';
-import { editTemplate, getTemplateByCodeId } from '../api/Api';
+import { editTemplate, getCollectionTypes, getTemplateByCodeId } from '../api/Api';
 // import { Row, Col, Grid, Breadcrumb } from 'patternfly-react';
 import { withRouter } from "react-router-dom";
 
@@ -16,6 +16,7 @@ class EditTemplate extends Component {
             code: '',
             name: '',
             contentType: [],
+            collectionTypes: [],
             contentTypeProgram: '',
         };
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -53,13 +54,10 @@ class EditTemplate extends Component {
     };
 
     handleSubmit = async (event) => {
-        console.log(this.state);
         event.preventDefault();
-        // // API Call
-
         await editTemplate(this.state.code, {
             description: this.state.name,
-            collectionType: this.state.contentType[0],
+            collectionType: this.state.contentType[0].label,
             contentShape: this.state.contentTypeProgram,
         }).
         then(res=>this.props.history.push('/'), err => console.error('error in EditTemplate.js handleSubmit method'))
@@ -67,23 +65,24 @@ class EditTemplate extends Component {
 
     componentDidMount = async () => {
         const { data } = await getTemplateByCodeId(this.props.match.params.templateId);
-        console.log("DATA",data)
-        // const getData = {
-        //     code: data[0].code,
-        //     contentType: [data[0].collectionType],
-        //     name: data[0].description,
-        //     contentTypeProgram: data[0].contentShape,
-        // }
         this.setState({
              code: data[0].code,
             contentType: [data[0].collectiontype],
             name: data[0].description,
             contentTypeProgram: data[0].contentshape
         })
+        let contentTypes = await getCollectionTypes();
+        contentTypes = contentTypes.data.data.filter(obj => {
+            return obj && (obj.uid && obj.uid.startsWith("api::")) && obj.isDisplayed;
+        });
+        const contentTypeRefine = [];
+        contentTypes.length && contentTypes.forEach(element => {
+            contentTypeRefine.push({ label: element.info.pluralName })
+        });
+        this.setState({ collectionTypes: contentTypeRefine })
     }
-
+    
     render() {
-        console.log("RENDER",this.state.contentType)
         return (
             <div style={{ margin: "1rem 1rem" }}>
                 <h1 style={{ fontWeight: "600" }}>Edit content template</h1>
@@ -156,8 +155,9 @@ class EditTemplate extends Component {
                                 <div className="col-lg-10">
                                     <Typeahead
                                         id="RandomId"
+                                        defaultSelected={[{label:"vijay"}]}
                                         onChange={this.handleTypeaheadChangeContentType}
-                                        options={['Banner', 'News', '2 columns']}
+                                        options={this.state.collectionTypes}
                                         placeholder="Choose..."
                                         selected={this.state.contentType}
                                     />

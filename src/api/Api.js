@@ -9,13 +9,23 @@ export const getTemplate = async () => {
     return data;
 }
 
+// GET Collection Type
+export const getCollectionTypes = async (token) => {
+    token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ2MTM0MDIyLCJleHAiOjE2NDg3MjYwMjJ9.JbSvPdP5D-WNeDIvOX7SYELMdKW-NdrBFYkcROhr0-A'
+    const data = await axios.get(`http://localhost:1337/content-manager/content-types`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    return data;
+}
+
 export const postTemplate = async (data) => {
     let url = `${apiEndpoint}`;
     await axios.post(url, data);
 }
 
 export const deleteTemplate = async (codeId) => {
-    console.log('selectedCode to be deleted', codeId);
     return await axios.delete(`${apiEndpoint}/${codeId}`)
 }
 
@@ -24,8 +34,8 @@ export const editTemplate = async (codeId, data) => {
 }
 
 export const getTemplateByCodeId = async (codeId) => {
-    let url = `${apiEndpoint}?filters[code][$eq]=${codeId}`;
-    const data = await axios.get(url);
+    // let url = `${apiEndpoint}?filters[code][$eq]=${codeId}`;
+    const data = await axios.get(`${apiEndpoint}/${codeId}`);
     return data;
 }
 

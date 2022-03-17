@@ -6,7 +6,7 @@ import 'brace/mode/html';
 import 'brace/theme/tomorrow';
 import 'brace/snippets/html';
 import 'brace/ext/language_tools';
-import { postTemplate } from '../api/Api';
+import { getCollectionTypes, postTemplate } from '../api/Api';
 import { withRouter } from "react-router-dom";
 import ModalUI from '../components/ModalUI';
 // import { Row, Col, Grid, Breadcrumb } from 'patternfly-react';
@@ -18,7 +18,8 @@ class AddTemplate extends Component {
             code: '',
             name: '',
             contentType: [],
-            contentTypeProgram: ''
+            contentTypeProgram: '',
+            collectionTypes: []
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCodeChange = this.handleCodeChange.bind(this);
@@ -53,10 +54,21 @@ class AddTemplate extends Component {
             collectionType: this.state.contentType[0],
             contentShape: this.state.contentTypeProgram,
         }
-        console.log('payload', data);
         await postTemplate(data).then((res) => {
             this.props.history.push('/')
         });
+    }
+
+    componentDidMount = async () => {
+        let contentTypes = await getCollectionTypes();
+        contentTypes = contentTypes.data.data.filter(obj => {
+            return obj && (obj.uid && obj.uid.startsWith("api::")) && obj.isDisplayed;
+        });
+        const contentTypeRefine = [];
+        contentTypes.length && contentTypes.forEach(element => {
+            contentTypeRefine.push({label: element.info.pluralName})
+        });
+        this.setState({ contentType: contentTypeRefine, collectionTypes: contentTypeRefine })
     }
 
     render() {
@@ -129,7 +141,8 @@ class AddTemplate extends Component {
                                 <Typeahead
                                     id="basic-typeahead-multiple"
                                     onChange={this.handleTypeaheadChangeContentType}
-                                    options={[{ label: 'Banner' }, { label: 'News' }, { label: '2 columns' }]}
+                                    options={this.state.collectionTypes}
+                                    // options={[{ label: 'Banner' }, { label: 'News' }, { label: '2 columns' }]}
                                     placeholder="Choose..."
                                     selected={this.state.contentType}
                                 />

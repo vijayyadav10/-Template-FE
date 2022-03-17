@@ -10,13 +10,10 @@ class WidgetElement extends HTMLElement {
     }
 
     get config() {
-        console.log("GET CONFIG THIS.REACTROOTREF.CURRENT",this.reactRootRef.current)
         return this.reactRootRef.current ? this.reactRootRef.current.state : {};
     }
 
     set config(value) {
-        console.log("BALUE", value)
-        console.log("SET CONFIG", this.reactRootRef.current);
         return this.reactRootRef.current.setState(value);
     }
 
