@@ -309,7 +309,7 @@ class AddTemplate extends Component {
                     }
                 }
 
-                const dictList  = this.state.dictionary;
+                const dictList  = this.state.dictList;
                 console.log('dictList === ', dictList);
 
                 callback(null, dictList);
