@@ -17,6 +17,23 @@ const langTools = ace.acequire('ace/ext/language_tools');
 const tokenUtils = ace.acequire('ace/autocomplete/util');
 const { textCompleter, keyWordCompleter, snippetCompleter } = langTools;
 const defaultCompleters = [textCompleter, keyWordCompleter, snippetCompleter];
+
+const escChars = term => term.replace('$', '\\$').replace('#', '\\#');
+const isAttribFunction = term => /[a-zA-Z]+\([^)]*\)(\.[^)]*\))?/g.test(term);
+
+const createSuggestionItem = (key, namespace, lvl = 0, meta = '') => ({
+  caption: key,
+  value: key,
+  score: 10000 + lvl,
+  meta: meta || `${namespace} Object ${isAttribFunction(key) ? 'Method' : 'Property'}`,
+});
+
+const aceOnBlur = onBlur => (_event, editor) => {
+    if (editor) {
+        const value = editor.getValue();
+        onBlur(value);
+    }
+};
 //sachin end
 
 class AddTemplate extends Component {
@@ -31,9 +48,127 @@ class AddTemplate extends Component {
             ///////////////////////sachin start
             editor: null,
             dictionaryLoaded: false,
-            dictionary: [],
+            dictionary: [
+                {
+                    "caption": "$content",
+                    "value": "$content",
+                    "score": 10000,
+                    "meta": "$content Object"
+                },
+                {
+                    "caption": "$i18n",
+                    "value": "$i18n",
+                    "score": 10000,
+                    "meta": "$i18n Object"
+                },
+                {
+                    "caption": "$info",
+                    "value": "$info",
+                    "score": 10000,
+                    "meta": "$info Object"
+                },
+                {
+                    "caption": "#if (<TRUE>) <DO> #else <DOANOTHER> #end",
+                    "value": "#if (<TRUE>) <DO> #else <DOANOTHER> #end",
+                    "score": 10000,
+                    "meta": "#if (<TRUE>) <DO> #else <DOANOTHER> #end Object"
+                },
+                {
+                    "caption": "#if (<TRUE>) <DO> #end",
+                    "value": "#if (<TRUE>) <DO> #end",
+                    "score": 10000,
+                    "meta": "#if (<TRUE>) <DO> #end Object"
+                },
+                {
+                    "caption": "#set ($<VAR> = <VALUE>)",
+                    "value": "#set ($<VAR> = <VALUE>)",
+                    "score": 10000,
+                    "meta": "#set ($<VAR> = <VALUE>) Object"
+                },
+                {
+                    "caption": "#foreach ($item in $<LIST>) $item #end",
+                    "value": "#foreach ($item in $<LIST>) $item #end",
+                    "score": 10000,
+                    "meta": "#foreach ($item in $<LIST>) $item #end Object"
+                }
+            ],
             dictList: [],
-            dictMapped: {},
+            dictMapped: {
+                "$content": {
+                    "title": [
+                        "getTextForLang(\"<LANG_CODE>\")",
+                        "text",
+                        "textMap(\"<LANG_CODE>\")"
+                    ],
+                    "abstract": [
+                        "getHead(<VALUE>)",
+                        "getHeadEscaped(VALUE)",
+                        "getTextAfterImage(<PERCENT_VALUE>)",
+                        "getTextBeforeImage(<PERCENT_VALUE>)",
+                        "getTextByRange(<START_PERCENT_VALUE>, <END_PERCENT_VALUE>)",
+                        "getTextForLang(\"<LANG_CODE>\")",
+                        "text",
+                        "textMap(\"<LANG_CODE>\")"
+                    ],
+                    "link": [
+                        "destination",
+                        "getTextForLang(\"<LANG_CODE>\")",
+                        "symbolicLink",
+                        "text",
+                        "textMap[\"<LANG_CODE>\"]"
+                    ],
+                    "image": [
+                        "getImagePath(<SIZE_ID>)",
+                        "getMetadata(\"<METADATA_CODE>\")",
+                        "getMetadataForLang(\"<METADATA_CODE>\", \"<LANG_CODE>\")",
+                        "getResource(\"<LANG_CODE>\")",
+                        "getResourceAltForLang(\"<LANG_CODE>\")",
+                        "getResourceDescriptionForLang(\"<LANG_CODE>\")",
+                        "getResourceLegendForLang(\"<LANG_CODE>\")",
+                        "getResourceTitleForLang(\"<LANG_CODE>\")",
+                        "getTextForLang(\"<LANG_CODE>\")",
+                        "resource",
+                        "resourceAlt",
+                        "resourceAltMap[\"<LANG_CODE>\"]",
+                        "resourceDescription",
+                        "resourceDescriptionMap[\"<LANG_CODE>\"]",
+                        "resourceLegend",
+                        "resourceLegendMap[\"<LANG_CODE>\"]",
+                        "resourceTitle",
+                        "resourceTitleMap[\"<LANG_CODE>\"]",
+                        "text",
+                        "textMap[\"<LANG_CODE>\"]"
+                    ],
+                    "placement": [
+                        "text"
+                    ],
+                    "getId()": null,
+                    "getCategories()": null,
+                    "getContentLink()": null,
+                    "getCreated('<DATE_PATTERN>')": null,
+                    "isUserAllowed('<PERMISSION_NAME>')": null,
+                    "getLastEditor()": null,
+                    "getContentOnPageLink('<PAGE_CODE>')": null,
+                    "getNonce()": null,
+                    "getLastModified('<DATE_PATTERN>')": null,
+                    "getVersion()": null,
+                    "getLangCode()": null
+                },
+                "$i18n": {
+                    "getLabelWithParams('<LABEL_CODE>').addParam('<PARAM_KEY>', '<PARAM_VALUE>')": null,
+                    "getLabel('<LABEL_CODE>')": null
+                },
+                "$info": {
+                    "getCurrentLang()": null,
+                    "getCurrentPage()": null,
+                    "getCurrentWidget()": null,
+                    "getConfigParameter('<PARAM_NAME>')": null
+                },
+                "#if (<TRUE>) <DO> #else <DOANOTHER> #end": {},
+                "#if (<TRUE>) <DO> #end": {},
+                "#set ($<VAR> = <VALUE>)": {},
+                "#foreach ($item in $<LIST>) $item #end": {}
+            },
             contentTemplateCompleter: null,
         };
         this.onEditorLoaded = this.onEditorLoaded.bind(this);
@@ -76,6 +211,13 @@ class AddTemplate extends Component {
         });
     }
     /////////////////////////sachin
+    componentDidUpdate(prevProps) {
+        const { dictionary } = this.props;
+        if (dictionary !== prevProps.dictionary) {
+            this.condenseRootDict();
+        }
+    }
+
     onEditorLoaded(editor) {
         this.setState({ editor });
 
@@ -150,6 +292,7 @@ class AddTemplate extends Component {
                     if (verified) {
                         this.disableRootSuggestions();
                         const { dictMapped } = this.state;
+                        console.log('dictMapped :::::::::::::::::::', dictMapped);
                         if (verified.namespace) {
                             const mappedToken = dictMapped[verified.namespace];
                             const dictList = mappedToken[verified.term]
@@ -165,35 +308,21 @@ class AddTemplate extends Component {
                         this.disableRootSuggestions();
                     }
                 }
-                let wordList = [{
-                    "word": "flow",
-                    "freq": 24,
-                    "score": 300,
-                    "flags": "bc",
-                    "syllables": "1"
-                  },
-                  {
-                    "word": "Noflow",
-                    "freq": 4,
-                    "score": 300,
-                    "flags": "bc",
-                    "syllables": "1"
-                  }
-                  ];
-                const { dictList } = this.state;
+
+                const dictList  = this.state.dictionary;
                 console.log('dictList === ', dictList);
 
-                // callback(null, wordList);
+                callback(null, dictList);
                 
-                console.log('wordList === ', wordList);
-                callback(null, wordList.map(function(ea) {
-                    return {
-                      name: ea.word,
-                      value: ea.word,
-                      score: ea.score,
-                      meta: "rhyme"
-                    };
-                  }))
+                // console.log('wordList === ', wordList);
+                // callback(null, wordList.map(function(ea) {
+                //     return {
+                //       name: ea.caption,
+                //       value: ea.value,
+                //       score: ea.score,
+                //       meta: "rhyme"
+                //     };
+                //   }))
             },
         };
 
@@ -201,6 +330,24 @@ class AddTemplate extends Component {
         this.setState({ contentTemplateCompleter });
     }
 
+    condenseRootDict() {
+        const { dictionary: _dict } = this.props;
+        const dictMapped = _dict.reduce((acc, curr) => {
+            acc[curr.code] = curr.methods;
+            return acc;
+        }, {});
+
+        const dictionary = _dict.map(({ code }) => (
+            createSuggestionItem(code, code, 0, `${code} Object`)
+        ));
+
+        this.setState({
+            dictionary,
+            dictMapped,
+            dictList: [...dictionary],
+            dictionaryLoaded: true,
+        });
+    }
 
     extractCodeFromCursor({ row, column }, prefixToken) {
         const { editor: { session } } = this.state;
@@ -217,6 +364,27 @@ class AddTemplate extends Component {
         const namespace = wholeToken.replace(/\.$/g, '');
         return { token, namespace };
     }
+
+    findTokenInDictMap(token, parentToken) {
+        const { dictMapped } = this.state;
+        const findInDict = (term, dict) => (
+            Object.keys(dict).find((key) => {
+                const keyRegEx = new RegExp(`${escChars(key)}$`, 'g');
+                return keyRegEx.test(term);
+            })
+        );
+        if (!parentToken) {
+            const term = findInDict(token, dictMapped);
+            return term && { term };
+        }
+        const namespace = findInDict(parentToken, dictMapped);
+        if (!namespace) {
+            return false;
+        }
+        const term = findInDict(token, dictMapped[parentToken]);
+        if (!term) return false;
+        return { term, namespace };
+    }
     ///////////////////////// sachin end
 
     componentDidMount = async () => {
@@ -228,6 +396,7 @@ class AddTemplate extends Component {
         contentTypes.length && contentTypes.forEach(element => {
             contentTypeRefine.push({label: element.info.pluralName})
         });
+        console.log('contentTypeRefine', contentTypeRefine);
         this.setState({ contentType: contentTypeRefine, collectionTypes: contentTypeRefine })
     }
 
