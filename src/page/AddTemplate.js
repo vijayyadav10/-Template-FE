@@ -7,7 +7,7 @@ import 'brace/mode/html';
 import 'brace/theme/tomorrow';
 import 'brace/snippets/html';
 import 'brace/ext/language_tools';
-import { getCollectionTypes, postTemplate } from '../api/Api';
+import { getCollectionTypes, getFields, postTemplate } from '../api/Api';
 import { withRouter } from "react-router-dom";
 import ModalUI from '../components/ModalUI';
 // import { Row, Col, Grid, Breadcrumb } from 'patternfly-react';
@@ -388,6 +388,9 @@ class AddTemplate extends Component {
     ///////////////////////// sachin end
 
     componentDidMount = async () => {
+        const data = await getFields();
+        console.log('DATA componentDidMount', data)
+        this.setState({dictMapped: data})
         let contentTypes = await getCollectionTypes();
         contentTypes = contentTypes.data.data.filter(obj => {
             return obj && (obj.uid && obj.uid.startsWith("api::")) && obj.isDisplayed;
