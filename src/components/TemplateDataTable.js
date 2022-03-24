@@ -38,7 +38,7 @@ class TemplateDataTable extends Component {
                             <tr>
                                 <th>Code</th>
                                 <th>Collection Type</th>
-                                <th>Content Template Name</th>
+                                <th>Collection Template Name</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
