@@ -50,10 +50,10 @@ class AddTemplate extends Component {
             dictionaryLoaded: false,
             dictionary: [
                 {
-                    "caption": "$content",
-                    "value": "$content",
+                    "caption": "content",
+                    "value": "{{content",
                     "score": 10000,
-                    "meta": "$content Object"
+                    "meta": "content Object"
                 },
                 {
                     "caption": "$i18n",
@@ -202,7 +202,7 @@ class AddTemplate extends Component {
         // // API Call
         const data = {
             code: this.state.code,
-            description: this.state.name,
+            templateName: this.state.name,
             collectionType: this.state.contentType[0],
             contentShape: this.state.contentTypeProgram,
         }
@@ -410,7 +410,7 @@ class AddTemplate extends Component {
                 <hr />
                 <div className="formContainer show-grid">
                     <form onSubmit={this.handleSubmit}>
-                        <div className="formContainer col-xs-12">
+                        {/* <div className="formContainer col-xs-12">
                             <div className="col-lg-2" style={{ textAlign: "end" }}>
                                 <label htmlFor="id" className="control-label">
                                     <span className="FormLabel">
@@ -430,7 +430,7 @@ class AddTemplate extends Component {
                                     onChange={this.handleCodeChange}
                                 />
                             </div>
-                        </div>
+                        </div> */}
                         <div className="formContainer col-xs-12">
                             <div className="col-lg-2" style={{ textAlign: "end" }}>
                                 <label htmlFor="id" className="control-label">

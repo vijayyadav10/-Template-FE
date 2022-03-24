@@ -51,7 +51,7 @@ class TemplateDataTable extends Component {
                                     <tr key={idx}>
                                         <td>{el.code || el.attributes.code}</td>
                                         <td>{el.collectiontype || el.attributes.collectionType}</td>
-                                        <td>{el.description || el.attributes.description}</td>
+                                        <td>{el.templatename || el.attributes.templatename}</td>
                                         <td>
                                             <DropdownKebab
                                                 className=""

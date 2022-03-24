@@ -22,7 +22,7 @@ export const getCollectionTypes = async (token) => {
 
 
 export const getFields = async (token) => {
-    const contentType = 'article'
+    const contentType = 'project'
     token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ2MTM0MDIyLCJleHAiOjE2NDg3MjYwMjJ9.JbSvPdP5D-WNeDIvOX7SYELMdKW-NdrBFYkcROhr0-A'
     const {data: {results}} = await axios.get(`http://localhost:1337/content-manager/collection-types/api::${contentType}.${contentType}?page=1&pageSize=10&sort=name:ASC`, {
         headers: {
@@ -33,7 +33,7 @@ export const getFields = async (token) => {
     const fieldsArr = Object.keys(results[0]);
     const content = {};
     fieldsArr.map((el) => {
-        content[el] = [
+        content[el + "}}"] = [
             "getTextForLang(\"<LANG_CODE>\")",
             "text",
             "textMap(\"<LANG_CODE>\")"
@@ -41,7 +41,7 @@ export const getFields = async (token) => {
 
         console.log('EL', el)
     })
-    let timepass = {'$content': content}
+    let timepass = {'content': content}
     console.log(timepass)
     return timepass;
 }
