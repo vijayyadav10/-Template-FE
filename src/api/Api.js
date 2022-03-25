@@ -2,6 +2,7 @@ import axios from 'axios';
 
 // const apiEndpoint = 'http://localhost:1337/api/templates';
 const apiEndpoint = 'http://localhost:8082/api/templates';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ2MTM0MDIyLCJleHAiOjE2NDg3MjYwMjJ9.JbSvPdP5D-WNeDIvOX7SYELMdKW-NdrBFYkcROhr0-A';
 
 export const getTemplate = async () => {
     let url = `${apiEndpoint}`;
@@ -10,8 +11,7 @@ export const getTemplate = async () => {
 }
 
 // GET Collection Type
-export const getCollectionTypes = async (token) => {
-    token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ2MTM0MDIyLCJleHAiOjE2NDg3MjYwMjJ9.JbSvPdP5D-WNeDIvOX7SYELMdKW-NdrBFYkcROhr0-A'
+export const getCollectionTypes = async () => {
     const data = await axios.get(`http://localhost:1337/content-manager/content-types`, {
         headers: {
             'Authorization': `Bearer ${token}`
@@ -38,7 +38,6 @@ export const getFields = async (contentType) => {
             "text",
             "textMap(\"<LANG_CODE>\")"
         ]
-
         console.log('EL', el)
     })
     let timepass = {'content': content}
