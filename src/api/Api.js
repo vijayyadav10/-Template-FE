@@ -21,9 +21,9 @@ export const getCollectionTypes = async (token) => {
 }
 
 
-export const getFields = async (token) => {
-    const contentType = 'project'
-    token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ2MTM0MDIyLCJleHAiOjE2NDg3MjYwMjJ9.JbSvPdP5D-WNeDIvOX7SYELMdKW-NdrBFYkcROhr0-A'
+export const getFields = async (contentType) => {
+    // const contentType = 'project'
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjQ2MTM0MDIyLCJleHAiOjE2NDg3MjYwMjJ9.JbSvPdP5D-WNeDIvOX7SYELMdKW-NdrBFYkcROhr0-A'
     const {data: {results}} = await axios.get(`http://localhost:1337/content-manager/collection-types/api::${contentType}.${contentType}?page=1&pageSize=10&sort=name:ASC`, {
         headers: {
             'Authorization': `Bearer ${token}`

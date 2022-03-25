@@ -191,7 +191,11 @@ class AddTemplate extends Component {
         this.setState({ contentTypeProgram: event })
     }
     
-    handleTypeaheadChangeContentType = selected => {
+    handleTypeaheadChangeContentType = async (selected) => {
+        if (selected.length) {
+            const data = await getFields(selected[0].label.slice(0, selected[0].label.length - 1));
+            this.setState({ dictMapped: data })
+        }
         let selectedContentType = selected.map(option => option.label);
         this.setState({ contentType: selectedContentType });
     };
@@ -388,19 +392,21 @@ class AddTemplate extends Component {
     ///////////////////////// sachin end
 
     componentDidMount = async () => {
-        const data = await getFields();
-        console.log('DATA componentDidMount', data)
-        this.setState({dictMapped: data})
         let contentTypes = await getCollectionTypes();
         contentTypes = contentTypes.data.data.filter(obj => {
             return obj && (obj.uid && obj.uid.startsWith("api::")) && obj.isDisplayed;
         });
         const contentTypeRefine = [];
         contentTypes.length && contentTypes.forEach(element => {
-            contentTypeRefine.push({label: element.info.pluralName})
+            contentTypeRefine.push({ label: element.info.pluralName })
         });
         console.log('contentTypeRefine', contentTypeRefine);
+
+        const data = await getFields(contentTypeRefine[0].label.slice(contentTypeRefine[0].label, contentTypeRefine[0].label.length - 1));
+        console.log('DATA componentDidMount', data)
+        this.setState({ dictMapped: data })
         this.setState({ contentType: contentTypeRefine, collectionTypes: contentTypeRefine })
+
     }
 
     render() {
