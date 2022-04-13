@@ -3,38 +3,55 @@ import React, { Component } from 'react'
 export default class TemplateSearch extends Component {
     render() {
         return (
-            <div style={{ margin: "1rem 0rem" }}>
-                {/* Search Box Container Start */}
-                <div className="well">
-                    <div className="well-title">Search by</div>
-                    <div className="show-grid row">
-                        <div className="col-lg-4">
-                            <button
-                                id="attribute"
-                                role="button"
-                                aria-haspopup="true"
-                                aria-expanded="false"
-                                type="button"
-                                className="app-bulider__dropdown"
-                            >Name <span className="caret"></span>
-                            </button>
+            <div className="well" style={{ height: "15rem" }}>
+                <div style={{ position: "relative", zIndex: "0" }}>
+                    <div className="container-fluid">
+                        <div className="show-grid row">
+                            <div className="col-lg-1" style={{fontSize: "large", fontWeight: "500"}}>Search</div>
+                            <div className="col-lg-10"></div>
                         </div>
-                        <div className="col-lg-8">
-                            <div>
-                                <div className="form-group">
-                                    <span className="input-group">
-                                        <input type="text" id="control-4" className="form-control" placeholder="Search content templates" />
-                                        <span className="input-group-addon" style={{ backgroundColor: "#043487", color: "white" }}>
-                                            <span aria-hidden="true" className="fa fa-search">
-                                            </span>
-                                        </span>
-                                    </span>
-                                </div>
+                        <div className="show-grid row" style={{ height: "3.2rem" }}>
+                            <div className="col-lg-1"></div>
+                            <div
+                                className="col-lg-1"
+                                style={{ fontSize: "larger", fontWeight: "600", position: "relative", top: "50%", transform: "translateY(-50%)", }}
+                            >Type</div>
+                            {/* <div
+                                className="col-lg-1"
+                                style={{ fontSize: "larger", fontWeight: "600", position: "relative", top: "50%", transform: "translateY(-50%)", }}
+                            ></div> */}
+                            <select className="col-lg-7" name="cars" id="cars" style={{ height: "100%", marginLeft: '2rem' }}>
+                                <option value="volvo">BC</option>
+                                <option value="saab">Saab</option>
+                                <option value="opel">Opel</option>
+                                <option value="audi">Audi</option>
+                            </select>
+                        </div>
+                        <div className="show-grid row" style={{ marginTop: "1rem" }}>
+                            <div className="col-lg-7"></div>
+                            <div className="col-lg-4" style={{marginLeft: "5rem"}}>
+                                <button className="btn btn-primary">Search</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                {/* Search Box Container End*/}
+                {/* <div className="well-title" style={{fontSize: "large", fontWeight: "600"}}>Search</div>
+                <div className="" style={{ height: "3.5rem" }}>
+                    <div className="col-lg-4" style={{ position: "relative",top: "50%",transform: "translateY(-50%)", fontSize: "large", fontWeight: "600" }}>Type</div>
+                    <select className="col-lg-6" name="cars" id="cars" style={{ height: "100%" }}>
+                        <option value="volvo">Volvo</option>
+                        <option value="saab">Saab</option>
+                        <option value="opel">Opel</option>
+                        <option value="audi">Audi</option>
+                    </select>
+                </div>
+                <div className="" style={{ height: "3.5rem" }}>
+                    <div className="col-lg-9"></div>
+                    <div className="col-lg-3" name="cars" id="cars" style={{ height: "100%" }}>
+                        <button className="btn btn-primary">Search</button>
+                    </div>
+                </div> */}
+                
             </div>
         )
     }

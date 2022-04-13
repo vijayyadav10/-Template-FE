@@ -55,9 +55,11 @@ class EditTemplate extends Component {
 
     handleSubmit = async (event) => {
         event.preventDefault();
+        console.log("THIS.STATE",this.state)
+        // TODO: uncom
         await editTemplate(this.state.code, {
-            description: this.state.name,
-            collectionType: this.state.contentType[0].label,
+            templatename: this.state.name,
+            collectiontype: this.state.contentType[0],
             contentShape: this.state.contentTypeProgram,
         }).
         then(res=>this.props.history.push('/'), err => console.error('error in EditTemplate.js handleSubmit method'))
@@ -68,7 +70,7 @@ class EditTemplate extends Component {
         this.setState({
              code: data[0].code,
             contentType: [data[0].collectiontype],
-            name: data[0].description,
+            name: data[0].templatename,
             contentTypeProgram: data[0].contentshape
         })
         let contentTypes = await getCollectionTypes();
@@ -90,7 +92,7 @@ class EditTemplate extends Component {
                 {this.state.code &&
                     <div className="formContainer show-grid">
                         <form onSubmit={this.handleSubmit}>
-                            <div className="formContainer col-xs-12">
+                            {/* <div className="formContainer col-xs-12">
                                 <div className="col-lg-2" style={{ textAlign: "end" }}>
                                     <label htmlFor="id" className="control-label">
                                         <span className="FormLabel">
@@ -114,7 +116,7 @@ class EditTemplate extends Component {
                                         onChange={this.handleCodeChange}
                                     />
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="formContainer col-xs-12">
                                 <div className="col-lg-2" style={{ textAlign: "end" }}>
                                     <label htmlFor="id" className="control-label">
@@ -160,6 +162,7 @@ class EditTemplate extends Component {
                                         options={this.state.collectionTypes}
                                         placeholder="Choose..."
                                         selected={this.state.contentType}
+                                        disabled
                                     />
                                 </div>
                             </div>
@@ -177,7 +180,7 @@ class EditTemplate extends Component {
                                     </label>
                                 </div>
                                 <div className="col-lg-10">
-                                    <button className="default-btn">Inline editing assistant</button>
+                                    <button type="button" className="default-btn">Inline editing assistant</button>
                                 </div>
                             </div>
                             <div className="formContainer col-xs-12">

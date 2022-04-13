@@ -500,7 +500,7 @@ class AddTemplate extends Component {
                                 </label>
                             </div>
                             <div className="col-lg-10">
-                                <button className="default-btn">Inline editing assistant</button>
+                                <button type="button" className="default-btn">Inline editing assistant</button>
                             </div>
                         </div>
                         <div className="formContainer col-xs-12">
